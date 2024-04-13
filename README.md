@@ -1,27 +1,50 @@
-import { TonConnectServer, AuthRequestTypes } from '@tonapps/tonconnect-server';
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Page Title</title>
+	</head>
+	<body>
+	<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+<div id="ton-connect"></div>
+<script>
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: 'https://<YOUR_APP_URL>/tonconnect-manifest.json',
+        buttonRootId: 'ton-connect'
+    });
+</script>
+<script>
+    async function connectToWallet() {
+        const connectedWallet = await tonConnectUI.connectWallet();
+        // Do something with connectedWallet if needed
+        console.log(connectedWallet);
+    }
 
-// Create a TonConnectServer instance configured with a static secret.
-const tonconnect = new TonConnectServer({ 
-    staticSecret: process.env.TONCONNECT_SECRET 
+    // Call the function
+    connectToWallet().catch(error => {
+        console.error("Error connecting to wallet:", error);
+    });
+</script>
+tonConnectUI.uiOptions = {
+      twaReturnUrl: 'https://t.me/YOUR_APP_NAME'
+  };
+import TonConnectUI from '@tonconnect/ui';
+
+const tonConnectUI = new TonConnectUI({ //connect application
+    manifestUrl: 'https://<YOUR_APP_URL>/tonconnect-manifest.json',
+    buttonRootId: '<YOUR_CONNECT_BUTTON_ANCHOR_ID>'
 });
 
-// When we need to authenticate the user, create an authentication request:
-const request = tonconnect.createRequest({
-    image_url: 'https://ddejfvww7sqtk.cloudfront.net/images/landing/ton-nft-tegro-dog/avatar/image_d0315e1461.jpg',
-    callback_url: `${hostname}/tonconnect`,
-    items: [{
-        type: AuthRequestTypes.ADDRESS,
-        required: true
-    }, {
-        type: AuthRequestTypes.OWNERSHIP,
-        required: true
-    }],
-});
+const transaction = {
+    messages: [
+        {
+            address: "0:412410771DA82CBA306A55FA9E0D43C9D245E38133CB58F1457DFB8D5CD8892F", // destination address
+            amount: "20000000" //Toncoin in nanotons
+        }
+    ]
+}
 
+const result = await tonConnectUI.sendTransaction(transaction)
 
-res.send(request);
- 
-// Example: Tonkeeper deeplink:
-// Provide the user with the URL to download that request.
-const requestURL = `example.com/myrequest`;
-const deeplinkURL = `https://app.tonkeeper.com/ton-login/${requestURL}`;
+await tonConnectUI.disconnect();
+	</body>
+</html>
